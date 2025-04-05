@@ -119,7 +119,6 @@ const App = () => {
             generateBotResponse={generateBotResponse}
             isLoading={isLoading}
           />
-
         </div>
       </div>
     </div>
