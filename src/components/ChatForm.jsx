@@ -1,26 +1,44 @@
 import { useRef } from 'react'
 
-const ChatForm = ({ chatHistory, setChatHistory, generateBotResponse }) => {
+const ChatForm = ({ chatHistory, setChatHistory, generateBotResponse, isLoading }) => {
   const inputRef = useRef()
 
   const handleFormSubmit = (e) => {
     e.preventDefault()
+    if (isLoading) return // Prevent multiple submits
 
     const userMessage = inputRef.current.value.trim()
     if (!userMessage) return
     inputRef.current.value = ""
 
-    setChatHistory((history) => [...history, { role: "user", text: userMessage }])
-    setTimeout(() => {
-      setChatHistory((history) => [...history, { role: "model", text: "Thinking..." }])
-      generateBotResponse([...chatHistory, { role: "user", text: userMessage }])
-    }, 600)
+    const updatedHistory = [...chatHistory, { role: "user", text: userMessage }]
+    setChatHistory([
+      ...updatedHistory,
+      { role: "model", text: "Thinking..." }
+    ])
+    generateBotResponse(updatedHistory)
   }
 
   return (
-    <form action="#" className="chat-form" onSubmit={handleFormSubmit}>
-      <input ref={inputRef} type="text" placeholder="Message..." className="message-input" required />
-      <button className="material-symbols-rounded">
+    <form className="chat-form" onSubmit={handleFormSubmit}>
+      <input
+        ref={inputRef}
+        type="text"
+        placeholder={isLoading ? "Please wait..." : "Message..."}
+        className="message-input"
+        required
+        disabled={isLoading}
+      />
+      <button
+        className="material-symbols-rounded"
+        type="submit"
+        disabled={isLoading}
+        title={isLoading ? "Wait for response" : "Send message"}
+        style={{
+          opacity: isLoading ? 0.4 : 1,
+          cursor: isLoading ? "not-allowed" : "pointer"
+        }}
+      >
         arrow_upward
       </button>
     </form>
